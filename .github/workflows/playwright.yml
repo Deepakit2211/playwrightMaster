@@ -12,39 +12,39 @@ jobs:
   timeout-minutes: 30
 
  steps: 
-  - name: checkout repository
-    uses: actions/checkout@v6
+   - name: checkout repository
+     uses: actions/checkout@v6
   
-  - name: Setup Node.js
-    uses: actions/setup-node@v6
-    with:
-     node-version: 22
-     cache: npm
+  -  name: Setup Node.js
+     uses: actions/setup-node@v6
+     with:
+      node-version: 22
+      cache: npm
 
-  - name: Install Dependencies
-    run: npm cli
+   - name: Install Dependencies
+     run: npm cli
 
-  - name: Install all playwright browser
-    run: npx playwright install --with-deps
+   - name: Install all playwright browser
+     run: npx playwright install --with-deps
 
-  - name: Run Cucumber tests
-    run: npm run test:cucumber
-    contunue-on-error: true
+   - name: Run Cucumber tests
+     run: npm run test:cucumber
+     contunue-on-error: true
 
-  - name: Generate Allure report
-    if: always()
-    run: npm run allure:generate
+   - name: Generate Allure report
+     if: always()
+     run: npm run allure:generate
 
-  - name: Upload Allure report
-    if: always()
-    uses: actions/upload-artifacts@v4
-    with:
-     name: allure report
-     path:
-      allure-report/
-      allure-result
-    if-no-files-found: warn
-    retention-days: 1
+   - name: Upload Allure report
+     if: always()
+     uses: actions/upload-artifacts@v4
+     with:
+      name: allure report
+      path:
+       allure-report/
+       allure-result
+     if-no-files-found: warn
+     retention-days: 1
 
 
 
