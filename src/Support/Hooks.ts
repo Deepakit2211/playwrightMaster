@@ -7,10 +7,10 @@ import * as allure from 'allure-js-commons'
 import 'allure-cucumberjs';
 
 export const STORAGE_STATE_PATH = path.join(process.cwd(),  './storageState/auth.json');
-export const STORAGE_STATE_MAX_AGE_MS = 2 * 60 * 60 * 1000; // treat session as expired after 24 hours
+export const STORAGE_STATE_MAX_AGE_MS = 15* 60 * 1000; // treat session as expired after 24 hours
 
 Before(async function(this:Global){
-    this.browser=await chromium.launch({headless:false});
+    this.browser=await chromium.launch({headless:true});
 
     // Reuse the saved session only if the file exists AND isn't older than the max age.
     // Otherwise start with a plain context - the login steps will detect this and log in for real.

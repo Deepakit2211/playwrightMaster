@@ -30,8 +30,6 @@ jobs:
 
       - name: Run Cucumber tests
         run: npm run test:cucumber
-        env: 
-          DEBUG: 'pw:api'
 
       - name: Generate Allure report
         if: always()
