@@ -1,3 +1,4 @@
+
 name: playwrightlearning_course
 
 on:
@@ -7,26 +8,23 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-permissions: 
+permissions:
   contents: read
   pages: write
   id-token: write
 
-concurrency: 
+concurrency:
   group: github-pages
   cancel-in-progress: false
-
-
-   
 
 jobs:
   automation-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    environment: 
+    environment:
       name: github-pages
-      url: ${{steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repository
@@ -41,23 +39,42 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Install all Playwright browsers
+      - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: Run Cucumber tests
+        id: cucumber
+        continue-on-error: true
         run: npm run test:cucumber
 
       - name: Generate Allure report
         if: always()
         run: npm run allure:generate
 
-      - name: Upload Allure report
+      - name: Upload Allure report artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
-          path: |
-            allure-report/
-            allure-results/
-          if-no-files-found: warn
-          retention-days: 1
+          path: allure-report/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Upload report for GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report/
+
+      - name: Publish Allure report
+        id: deployment
+        if: github.event_name != 'pull_request'
+        uses: actions/deploy-pages@v4
+
+      - name: Fail workflow if tests failed
+        if: steps.cucumber.outcome == 'failure'
+        run: exit 1
